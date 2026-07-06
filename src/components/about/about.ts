@@ -8,6 +8,7 @@ import { isPlatformBrowser } from '@angular/common';
   styleUrl: './about.css'
 })
 export class About implements OnDestroy {
+  private startDate = new Date(2020, 0, 1);
   private birthday = new Date(2007, 11, 13); 
   greetings = ['Hello', 'Hola', 'Ciao'];
   greeting = signal(this.greetings[0]);
@@ -16,6 +17,7 @@ export class About implements OnDestroy {
   private timer: any = null;
 
   age = computed(() => this.calculateAge(this.birthday));
+  yearsOfExperience = computed(() => this.calculateYearsOfExperience(this.startDate));
 
   constructor(@Inject(PLATFORM_ID) private platformId: object) {
     if (isPlatformBrowser(this.platformId)) {
@@ -36,6 +38,18 @@ export class About implements OnDestroy {
     }
 
     return age;
+  }
+
+  private calculateYearsOfExperience(startDate: Date): number {
+    const today = new Date();
+    let yearsOfExperience = today.getFullYear() - startDate.getFullYear();
+    const monthDiff = today.getMonth() - startDate.getMonth();
+
+    if (monthDiff < 0) {
+      yearsOfExperience--;
+    }
+
+    return yearsOfExperience;
   }
 
   ngOnDestroy() {

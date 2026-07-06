@@ -16,7 +16,7 @@
     @for (item of filtered; track item.id) {
       <div class="gallery__card">
         <div class="gallery__card-visual" [style.background]="item.color">
-          <span class="gallery__card-emoji">{{ item.emoji }}</span>
+          <img class="gallery__card-image" src="{{ item.img }}" alt="{{ item.label }}" (click)="openLightbox(item)" />
           <div class="gallery__card-overlay">
             <span class="gallery__card-style">{{ item.style }}</span>
           </div>
@@ -28,4 +28,13 @@
       </div>
     }
   </div>
+
+  @if (selectedImage) {
+    <div class="gallery__lightbox" (click)="closeLightbox()">
+      <div class="gallery__lightbox-card" (click)="$event.stopPropagation()">
+        <img class="gallery__lightbox-image" src="{{ selectedImage.img }}" alt="{{ selectedImage.label }}" />
+        <button class="gallery__lightbox-close" (click)="closeLightbox()">×</button>
+      </div>
+    </div>
+  }
 </section>

@@ -28,9 +28,7 @@
             "styles": ["src/styles.css"],
             "outputMode": "static",
             "baseHref": "/",
-            "security": {
-              "allowedHosts": []
-            }
+            "security": {}
           },
           "configurations": {
             "production": {

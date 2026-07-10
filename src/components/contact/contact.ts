@@ -3,6 +3,8 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { isPlatformBrowser } from '@angular/common';
+import { environment } from '../../environment';
+
 
 declare const google: any;
 
@@ -13,7 +15,14 @@ declare const google: any;
   templateUrl: './contact.html',
   styleUrl: './contact.css'
 })
+
+
 export class Contact implements AfterViewInit {
+  
+  private readonly SERVICE_ID = environment.emailJsServiceId;
+  private readonly TEMPLATE_ID_NOTIFY = environment.emailJsTemplateIdNotify;
+  private readonly PUBLIC_KEY = environment.emailJsPublicKey;
+  private readonly GOOGLE_CLIENT_ID = environment.googleClientId;
   submitted   = false;
   sending     = false;
   error       = false;
@@ -28,11 +37,6 @@ export class Contact implements AfterViewInit {
   email       = signal('');
   emailLocked = signal(false);
 
-  private SERVICE_ID         = 'service_l8ums9n';
-  private TEMPLATE_ID_NOTIFY = 'template_g82rvur';
-  private PUBLIC_KEY         = 'DeVcUcw3keRhgO2t3';
-
-  private GOOGLE_CLIENT_ID   = '55988937584-v6pvh0vaagqbcf1clki9211rs5q85nhf.apps.googleusercontent.com';
 
   private countdownTimer: any = null;
 

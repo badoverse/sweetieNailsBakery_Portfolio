@@ -1,151 +1,302 @@
 import {
-  Component, Inject, PLATFORM_ID, ChangeDetectorRef, NgZone, AfterViewInit, signal
-} from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { isPlatformBrowser } from '@angular/common';
-import { environment } from '../../environment';
+  Component,
+  Inject,
+  PLATFORM_ID,
+  ChangeDetectorRef,
+  NgZone,
+  AfterViewInit,
+  signal,
+} from "@angular/core";
 
+import { FormsModule } from "@angular/forms";
+import { isPlatformBrowser } from "@angular/common";
+import { environment } from "../../environment";
 
 declare const google: any;
 
 @Component({
-  selector: 'app-contact',
+  selector: "app-contact",
   standalone: true,
   imports: [FormsModule],
-  templateUrl: './contact.html',
-  styleUrl: './contact.css'
+  templateUrl: "./contact.html",
+  styleUrl: "./contact.css",
 })
-
-
 export class Contact implements AfterViewInit {
-  
   private readonly SERVICE_ID = environment.emailJsServiceId;
   private readonly TEMPLATE_ID_NOTIFY = environment.emailJsTemplateIdNotify;
   private readonly PUBLIC_KEY = environment.emailJsPublicKey;
   private readonly GOOGLE_CLIENT_ID = environment.googleClientId;
-  submitted   = false;
-  sending     = false;
-  error       = false;
-  errorMsg    = '';
-  countdown   = 0;
+
+  submitted = false;
+  sending = false;
+
+  error = false;
+  errorMsg = "";
+
+  countdown = 0;
   currentYear = new Date().getFullYear();
 
-  name    = '';
-  service = '';
-  message = '';
+  name = "";
+  service = "";
+  message = "";
 
-  email       = signal('');
+  email = signal("");
   emailLocked = signal(false);
-
 
   private countdownTimer: any = null;
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: object,
     private cdr: ChangeDetectorRef,
-    private zone: NgZone
+    private zone: NgZone,
   ) {}
 
   ngAfterViewInit() {
     if (!isPlatformBrowser(this.platformId)) return;
+
     this.loadGoogle();
   }
 
+  /*
+    GOOGLE LOGIN
+  */
 
   private loadGoogle() {
     if ((window as any).google?.accounts?.id) {
       this.initGoogle();
       return;
     }
-    if (document.getElementById('google-gsi')) {
+
+    if (document.getElementById("google-gsi")) {
       const wait = setInterval(() => {
         if ((window as any).google?.accounts?.id) {
           clearInterval(wait);
           this.initGoogle();
         }
       }, 150);
+
       return;
     }
-    const s = document.createElement('script');
-    s.id    = 'google-gsi';
-    s.src   = 'https://accounts.google.com/gsi/client';
-    s.async = true;
-    s.defer = true;
-    s.onload = () => this.initGoogle();
-    document.body.appendChild(s);
+
+    const script = document.createElement("script");
+
+    script.id = "google-gsi";
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+
+    script.onload = () => this.initGoogle();
+
+    document.body.appendChild(script);
   }
 
   private initGoogle() {
     if (!(window as any).google?.accounts?.id) return;
+
     google.accounts.id.initialize({
       client_id: this.GOOGLE_CLIENT_ID,
-      callback: (resp: any) => this.handleCredential(resp),
+
+      callback: (response: any) => this.handleCredential(response),
+
       auto_select: false,
     });
-    const target = document.getElementById('google-signin');
-    if (target) {
-      google.accounts.id.renderButton(target, {
-        theme: 'outline',
-        size: 'large',
-        text: 'signin_with',
-        shape: 'pill',
+
+    const button = document.getElementById("google-signin");
+
+    if (button) {
+      google.accounts.id.renderButton(button, {
+        theme: "outline",
+        size: "large",
+        text: "signin_with",
+        shape: "pill",
       });
     }
+
     google.accounts.id.prompt();
   }
 
-  private handleCredential(resp: any) {
+  private handleCredential(response: any) {
     try {
-      const base64Url = resp.credential.split('.')[1];
-      const base64    = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const json      = decodeURIComponent(
+      const base64Url = response.credential.split(".")[1];
+
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+
+      const json = decodeURIComponent(
         atob(base64)
-          .split('')
-          .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-          .join('')
+          .split("")
+          .map(
+            (char) => "%" + ("00" + char.charCodeAt(0).toString(16)).slice(-2),
+          )
+          .join(""),
       );
+
       const payload = JSON.parse(json);
 
       this.zone.run(() => {
-        this.email.set(payload.email || '');
-        this.name = this.name || payload.name || '';
-        this.emailLocked.set(!!payload.email);
-        this.error    = false;
-        this.errorMsg = '';
+        this.email.set(payload.email || "");
+
+        if (!this.name) {
+          this.name = payload.name || "";
+        }
+
+        this.emailLocked.set(Boolean(payload.email));
+
+        this.error = false;
+        this.errorMsg = "";
+
         this.cdr.detectChanges();
       });
-    } catch (err) {
-      console.error('Google credential parse error:', err);
+    } catch (error) {
+      console.error("Google credential error:", error);
     }
   }
 
+  /*
+    VALIDATION
+  */
 
-  private isValidEmailFormat(email: string): boolean {
+  private isValidEmailFormat(email: string) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   }
 
-  private async emailExists(email: string): Promise<boolean> {
+  private validateForm(): boolean {
+    const cleanName = this.name.trim();
+
+    const cleanMessage = this.message.trim();
+
+    if (!cleanName) {
+      this.showError("Please enter your name.");
+
+      return false;
+    }
+
+    if (cleanName.length < 2) {
+      this.showError("Your name must contain at least 2 characters.");
+
+      return false;
+    }
+
+    if (cleanName.length > 50) {
+      this.showError("Your name cannot exceed 50 characters.");
+
+      return false;
+    }
+
+    if (!this.service) {
+      this.showError("Please select a service.");
+
+      return false;
+    }
+
+    if (cleanMessage.length < 25) {
+      this.showError("Your message must contain at least 25 characters.");
+
+      return false;
+    }
+
+    if (cleanMessage.length > 1000) {
+      this.showError("Your message cannot exceed 1000 characters.");
+
+      return false;
+    }
+
+    return true;
+  }
+
+  private showError(message: string) {
+    this.error = true;
+    this.errorMsg = message;
+
+    this.cdr.detectChanges();
+  }
+
+  /*
+    SUBMIT
+  */
+
+  async onSubmit(event: Event) {
+    event.preventDefault();
+
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    this.error = false;
+    this.errorMsg = "";
+
+    const userEmail = this.email();
+
+    if (!userEmail) {
+      this.showError("Please sign in with Google before sending.");
+
+      return;
+    }
+
+    if (!this.isValidEmailFormat(userEmail)) {
+      this.showError("Please use a valid email address.");
+
+      return;
+    }
+
+    if (!this.validateForm()) return;
+
+    this.sending = true;
+
     try {
-      const res = await fetch(
-        `https://api.disify.com/api/email/${encodeURIComponent(email.trim())}`
+      const emailjs = await import("@emailjs/browser");
+
+      await emailjs.send(
+        this.SERVICE_ID,
+
+        this.TEMPLATE_ID_NOTIFY,
+
+        {
+          from_name: this.name.trim(),
+
+          from_email: userEmail,
+
+          service: this.service,
+
+          message: this.message.trim(),
+        },
+
+        {
+          publicKey: this.PUBLIC_KEY,
+        },
       );
-      if (!res.ok) return true;
-      const data = await res.json();
-      return data.format === true && data.dns === true;
-    } catch {
-      return true;
+
+      this.zone.run(() => {
+        this.submitted = true;
+
+        this.sending = false;
+
+        this.startCountdown(5);
+
+        this.cdr.detectChanges();
+      });
+    } catch (error) {
+      console.error("EmailJS error:", error);
+
+      this.zone.run(() => {
+        this.sending = false;
+
+        this.showError("Unable to send your enquiry. Please try again later.");
+      });
     }
   }
 
+  /*
+    RESET + COUNTDOWN
+  */
 
   private resetForm() {
-    this.name    = '';
-    this.service = '';
-    this.message = '';
-    this.error   = false;
-    this.errorMsg = '';
+    this.name = "";
+    this.service = "";
+    this.message = "";
+
+    this.error = false;
+    this.errorMsg = "";
+
     if (!this.emailLocked()) {
-      this.email.set('');
+      this.email.set("");
     }
   }
 
@@ -158,12 +309,15 @@ export class Contact implements AfterViewInit {
 
     this.countdownTimer = setInterval(() => {
       this.zone.run(() => {
-        this.countdown -= 1;
+        this.countdown--;
 
         if (this.countdown <= 0) {
           clearInterval(this.countdownTimer);
+
           this.countdownTimer = null;
+
           this.submitted = false;
+
           this.resetForm();
         }
 
@@ -171,74 +325,4 @@ export class Contact implements AfterViewInit {
       });
     }, 1000);
   }
-
-  async onSubmit(e: Event) {
-    e.preventDefault();
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    this.error    = false;
-    this.errorMsg = '';
-
-    const email = this.email();
-
-    if (!this.name.trim() || !email.trim() || !this.service || !this.message.trim()) {
-      this.errorMsg = 'Please fill in all fields before sending.';
-      this.error    = true;
-      return;
-    }
-
-    if (!this.isValidEmailFormat(email)) {
-      this.errorMsg = 'Please enter a valid email address.';
-      this.error    = true;
-      return;
-    }
-
-    this.sending = true;
-    this.cdr.detectChanges();
-
-    if (!this.emailLocked()) {
-      const exists = await this.emailExists(email);
-      if (!exists) {
-        this.zone.run(() => {
-          this.errorMsg = 'That email address doesn\'t appear to exist. Please double-check it.';
-          this.error    = true;
-          this.sending  = false;
-          this.cdr.detectChanges();
-        });
-        return;
-      }
-    }
-    if (this.message.length > 1000 && this.message.length < 25 && this.name != '') {
-    try {
-      const emailjs = await import('@emailjs/browser');
-      await emailjs.send(
-        this.SERVICE_ID,
-        this.TEMPLATE_ID_NOTIFY,
-        {
-          from_name:  this.name,
-          from_email: email,
-          service:    this.service,
-          message:    this.message,
-        },
-        { publicKey: this.PUBLIC_KEY }
-      );
-      this.zone.run(() => {
-        this.submitted = true;
-        this.sending   = false;
-        this.cdr.detectChanges();
-        this.startCountdown(3);
-      });
-    } catch (err: any) {
-      console.error('EmailJS error:', err);
-      this.zone.run(() => {
-        this.errorMsg = 'Something went wrong. Please try again or DM on Instagram.';
-        this.error    = true;
-        this.sending  = false;
-        this.cdr.detectChanges();
-        });
-      }
-    } else {
-      console.log("cock")
-    }
-  } 
 }

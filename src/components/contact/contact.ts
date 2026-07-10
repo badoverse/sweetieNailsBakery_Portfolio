@@ -208,7 +208,7 @@ export class Contact implements AfterViewInit {
         return;
       }
     }
-
+    if (this.message.length > 1000 && this.message.length < 25 && this.name != '') {
     try {
       const emailjs = await import('@emailjs/browser');
       await emailjs.send(
@@ -235,7 +235,10 @@ export class Contact implements AfterViewInit {
         this.error    = true;
         this.sending  = false;
         this.cdr.detectChanges();
-      });
+        });
+      }
+    } else {
+      console.log("cock")
     }
-  }
+  } 
 }

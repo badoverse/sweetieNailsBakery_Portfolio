@@ -29,7 +29,7 @@
     }
   </div>
 
-  @if (selectedImage) {
+  @if (selectedImage && !isMobile()) {
     <div class="gallery__lightbox" (click)="closeLightbox()">
       <div class="gallery__lightbox-card" (click)="$event.stopPropagation()">
         <img class="gallery__lightbox-image" src="{{ selectedImage.img }}" alt="{{ selectedImage.label }}" />

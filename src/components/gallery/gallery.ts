@@ -41,7 +41,9 @@ export class Gallery {
     console.log('Selected image:', item);
     this.selectedImage = item;
   }
-
+  isMobile(): boolean {
+    return window.matchMedia('(max-width: 768px)').matches;
+  }
   closeLightbox() {
     console.log('Lightbox closed');
     this.selectedImage = null;

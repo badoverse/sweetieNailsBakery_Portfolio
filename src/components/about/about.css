@@ -176,4 +176,44 @@
 @keyframes greetIn {
   from { opacity: 0; transform: translateY(0.35em); filter: blur(4px); }
   to   { opacity: 1; transform: translateY(0);      filter: blur(0); }
+}.pc-only {
+  display: none;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.mobile-view {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .pc-only {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  ul {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  ul li {
+    list-style-type: none;
+  }
+
+  ul li::marker {
+    content: "";
+  }
+
+  .mobile-view {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
 }

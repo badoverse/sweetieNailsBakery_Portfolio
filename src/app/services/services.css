@@ -68,6 +68,20 @@
 }
 .service-card:hover::before { transform: scaleX(1); }
 
+.service-card__unavailable {
+  margin: -2rem -2rem 1.2rem;
+  padding: 0.55rem 1rem;
+  background: linear-gradient(90deg, #d92b2b, #ff5c5c);
+  color: #fff;
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+
 .service-card__top {
   display: flex;
   justify-content: space-between;

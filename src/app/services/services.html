@@ -6,7 +6,10 @@
     </div>
     <div class="services__grid">
       @for (s of services; track s.name) {
-        <div class="service-card">
+        <div class="service-card" [class.unavailable]="!s.available">
+          @if (!s.available) {
+            <div class="service-card__unavailable">Currently Unavailable</div>
+          }
           <div class="service-card__top">
             <span class="service-card__icon">{{ s.icon }}</span>
             <span class="service-card__price">{{ s.price }}</span>

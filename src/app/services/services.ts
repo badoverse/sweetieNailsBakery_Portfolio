@@ -9,9 +9,10 @@ import { Component } from '@angular/core';
 })
 export class Services {
   services = [
-    { icon: '✦', name: 'Gel Extensions', desc: 'Custom-shaped gel extensions built for longevity and beauty. Perfect for special occasions or everyday elegance.', duration: '90 min', price: 'From €85' },
-    { icon: '✿', name: 'Nail Art Design', desc: 'Hand-painted floral, abstract, and seasonal designs. Each nail a tiny canvas, each set a unique story.', duration: '60 min', price: 'From €55' },
-    { icon: '❀', name: 'Soft Gel Overlay', desc: 'Strengthen your natural nails with a soft gel overlay in your choice of sheer, tinted, or french finish.', duration: '75 min', price: 'From €65' },
-    { icon: '◇', name: 'Nail Infills', desc: 'Refresh and maintain your existing set. Includes shape correction, cuticle care, and a colour refresh.', duration: '60 min', price: 'From €45' },
+    {icon: '✧', name: 'Nail Press-on', desc: 'Safe and gentle removal of gel or acrylic nails, followed by a nourishing treatment for your natural nails.', duration: '30 min', price: 'From €25', available: true }, 
+    { icon: '✦', name: 'Gel Extensions', desc: 'Custom-shaped gel extensions built for longevity and beauty. Perfect for special occasions or everyday elegance.', duration: '90 min', price: 'From €85', available: false },
+    { icon: '✿', name: 'Nail Art Design', desc: 'Hand-painted floral, abstract, and seasonal designs. Each nail a tiny canvas, each set a unique story.', duration: '60 min', price: 'From €55', available: false },
+    { icon: '❀', name: 'Soft Gel Overlay', desc: 'Strengthen your natural nails with a soft gel overlay in your choice of sheer, tinted, or french finish.', duration: '75 min', price: 'From €65', available: false },
+    { icon: '◇', name: 'Nail Infills', desc: 'Refresh and maintain your existing set. Includes shape correction, cuticle care, and a colour refresh.', duration: '60 min', price: 'From €45', available: false },
   ];
 }

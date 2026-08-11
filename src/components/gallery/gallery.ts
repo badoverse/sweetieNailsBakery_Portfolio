@@ -33,6 +33,13 @@ export class Gallery {
       tag: 'Tipo 2',
       img: 'https://i.postimg.cc/zDW3WRzL/Snap-Insta-to-670959238-18092403634975839-4641317102916425429-n.webp'
     },
+    {
+      id: 3,
+      label: 'Example 3',
+      style: 'Minimalist',
+      color: 'linear-gradient(135deg,#e8a4b8,#d88ca0)',
+      tag: 'Tipo 3',
+      img: 'https://iili.io/C67cnTX.jpg'}
   ];
 
   selectedImage: NailSet | null = null;
